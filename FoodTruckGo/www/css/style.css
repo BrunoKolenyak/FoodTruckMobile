@@ -1,1 +1,19 @@
 /* Empty. Add your own CSS if you like */
+ion-content{
+	background-image: url("/img/login-image.jpg");
+	background-size: cover;
+	background-position: auto;
+}
+
+.login .item-floating-label{
+	display: block;
+	box-shadow: none;
+	background-color: opacity;	
+	border: 0px;
+	border-bottom: 1px solid;
+}
+
+.login ::-webkit-input-placeholder{
+	color: black;
+	font-size: 1.3em;
+}
