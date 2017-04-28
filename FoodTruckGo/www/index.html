@@ -16,6 +16,7 @@
       }
     </script>-->
 
+    <link href="css/fonts.css" rel="stylesheet">
     <link href="lib/ionic/css/ionic.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
 
@@ -25,6 +26,7 @@
 
     <!-- ionic/angularjs js -->
     <script src="lib/ionic/js/ionic.bundle.js"></script>
+    <script src="lib/ionic.cloud.min.js"></script>
 
     <!-- cordova script (this will be a 404 during development) -->
     <script src="cordova.js"></script>
@@ -32,6 +34,25 @@
     <!-- your app's js -->
     <script src="js/app.js"></script>
     <script src="js/controllers.js"></script>
+
+    <!-- firebase js -->
+    <script src="lib/firebase/firebase.js"></script>
+    <script src="lib/firebase/angularfire.min.js"></script>
+
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyAV0D8c9oPLxEErkVZrPqLpNhCEFfQU9-0",
+        authDomain: "foodtruck-e0937.firebaseapp.com",
+        databaseURL: "https://foodtruck-e0937.firebaseio.com",
+        projectId: "foodtruck-e0937",
+        storageBucket: "foodtruck-e0937.appspot.com",
+        messagingSenderId: "403996835332"
+      };
+      firebase.initializeApp(config);
+    </script>
+
+
   </head>
 
   <body ng-app="FoodTruck">

@@ -1,0 +1,38 @@
+<ion-view title="Cadastrar">
+	<ion-content class="login registro">
+
+		<p> Você está a poucos passos da felicidade</p>
+
+		<form class="padding" ng-submit="salvar(usuario)" name="formCadastro">
+			<ion-list>
+				<label class="item item-input item-floating-label">
+					<span class="input-label">Nome:</span>
+					<input type="text" placeholder="Nome" ng-model='usuario.name' required/>
+				</label>
+
+				<label class="item item-input item-floating-label">
+					<span class="input-label">E-Mail:</span>
+					<input type="email" placeholder="E-mail" ng-model='usuario.email' required/>
+				</label>
+
+				<label class="item item-input item-floating-label">
+					<span class="input-label">Senha</span>
+					<input type="password" placeholder="Senha" ng-model='usuario.password' required ng-minlength="6"/>
+				</label>
+
+				<label style="padding-left: 10px">
+					<input type="radio" ng-model="usuario.tipo" value="cliente" required>
+					<span class="radio-label">Cliente</span>
+				</label>
+				<label style="padding-left: 30px">
+					<input type="radio" ng-model="usuario.tipo" value="truck">
+					<span class="radio-label">Food Truck</span>
+				</label>
+
+				<button class="button button-balanced button-block" type="submit" ng-disabled="formCadastro.$invalid">Cadastrar</button>
+
+			</ion-list>
+		</form>
+
+	</ion-content>
+</ion-view>

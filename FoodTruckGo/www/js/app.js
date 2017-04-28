@@ -4,9 +4,10 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('FoodTruck', ['ionic', 'starter.controllers'])
 
-.run(function($ionicPlatform) {
+var app = angular.module('FoodTruck', ['ionic', 'ionic.cloud', 'firebase']);
+
+app.run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -22,7 +23,14 @@ angular.module('FoodTruck', ['ionic', 'starter.controllers'])
   });
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
+app.config(function($stateProvider, $urlRouterProvider, $ionicCloudProvider) {
+  
+  $ionicCloudProvider.init({
+    "core": {
+      "app_id": "62f1044f"
+    }
+  });
+
   $stateProvider
 
   .state('login', {
@@ -31,38 +39,29 @@ angular.module('FoodTruck', ['ionic', 'starter.controllers'])
     controller: 'LoginCtrl'
   })
 
-  /**
-$stateProvider.state('login', {
-    url: '/login',
-    templateUrl: 'templates/login.html',
-    controller: 'LoginCtrl'
-  });
-  */
+  .state('registro', {
+    url: '/registro',
+    templateUrl: 'templates/registro.html',
+    controller: "RegistroCtrl"
+  })
 
-    .state('app', {
-    url: '/app',
+  .state('cliente', {
+    url: '/cliente',
     abstract: true,
-    templateUrl: 'templates/menu.html',
-    controller: 'AppCtrl'
+    templateUrl: 'templates/cliente/home.html',
+    controller: 'ClienteCtrl'
   })
 
-  .state('app.search', {
-    url: '/search',
-    views: {
-      'menuContent': {
-        templateUrl: 'templates/search.html'
-      }
-    }
-  })
-
-  .state('app.browse', {
-      url: '/browse',
+  .state('cliente.localizar', {
+      url: '/clienteLocalizar',
       views: {
         'menuContent': {
-          templateUrl: 'templates/browse.html'
+          templateUrl: 'templates/cliente/localizar.html'
         }
       }
     })
+
+  
     .state('app.playlists', {
       url: '/playlists',
       views: {
