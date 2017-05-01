@@ -3,12 +3,6 @@
 	height: 0px;
 }
 
-ion-content{
-	background-image: url("/img/login-image.jpg");
-	background-size: cover;
-	background-position: auto;
-}
-
 .login p{
 	margin-top: 4em; 
 	padding: 10px;
@@ -36,10 +30,27 @@ ion-content{
 	padding: 5px;
 }
 
-ion-nav-bar, button, a, span{
+ion-nav-bar, button, a, span, p, h1, h2, h3{
 	font-family: 'Gloria Hallelujah', cursive;
 }
 
 .radio-label{
 	font-size: 1.3em;
+}
+
+.cliente h2{
+	margin-top: 1em;
+	text-align: center;
+	color: white;
+}
+
+.cliente h3{
+	padding-top: 5em;
+	text-align: center;
+
+}
+
+.cliente{
+	background-image: url("../img/login-image.jpg");
+	background-size: cover;
 }
