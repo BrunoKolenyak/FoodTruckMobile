@@ -5,7 +5,7 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
 
-var app = angular.module('FoodTruck', ['ionic', 'ionic.cloud', 'firebase']);
+var app = angular.module('FoodTruck', ['ionic', 'ionic.cloud', 'firebase', 'ngCordova']);
 
 app.run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -59,28 +59,15 @@ app.config(function($stateProvider, $urlRouterProvider, $ionicCloudProvider) {
           templateUrl: 'templates/cliente/localizar.html'
         }
       }
-    })
+  })
 
-  
-    .state('app.playlists', {
-      url: '/playlists',
-      views: {
-        'menuContent': {
-          templateUrl: 'templates/playlists.html',
-          controller: 'PlaylistsCtrl'
-        }
-      }
-    })
+  .state('mapa', {
+    url: '/mapa?:lat&:long',
+    templateUrl: 'templates/cliente/mapa.html',
+    controller: "MapaCtrl"
+  })
 
-  .state('app.single', {
-    url: '/playlists/:playlistId',
-    views: {
-      'menuContent': {
-        templateUrl: 'templates/playlist.html',
-        controller: 'PlaylistCtrl'
-      }
-    }
-  });
+
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/login');
 });

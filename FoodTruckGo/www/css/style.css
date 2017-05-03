@@ -50,7 +50,16 @@ ion-nav-bar, button, a, span, p, h1, h2, h3{
 
 }
 
+.cliente button, div{
+	text-align: center;
+}
+
 .cliente{
 	background-image: url("../img/login-image.jpg");
 	background-size: cover;
+}
+
+#map{
+    height: 90vh;
+    width: 100%;
 }
