@@ -57,7 +57,8 @@ app.config(function($stateProvider, $urlRouterProvider, $ionicCloudProvider) {
       url: '/clienteLocalizar',
       views: {
         'menuContent': {
-          templateUrl: 'templates/cliente/localizar.html'
+          templateUrl: 'templates/cliente/localizar.html',
+          controller: 'LocalizarCtrl'
         }
       },
   })
@@ -76,6 +77,22 @@ app.config(function($stateProvider, $urlRouterProvider, $ionicCloudProvider) {
     url: '/mapa?:lat&:long',
     templateUrl: 'templates/cliente/mapa.html',
     controller: "MapaCtrl"
+  })
+
+  .state('truck', {
+    url: '/truck',
+    abstract: true,
+    templateUrl: 'templates/truck/home.html',
+    controller: 'TruckCtrl'
+  })
+
+  .state('truck.home', {
+      url: '/truckHome',
+      views: {
+        'menuContent': {
+          templateUrl: 'templates/truck/inicial.html',
+        }
+      },
   })
 
 

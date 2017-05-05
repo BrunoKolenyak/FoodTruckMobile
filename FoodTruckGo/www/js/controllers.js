@@ -1,4 +1,4 @@
-app.controller('LoginCtrl', function($scope, $state, $firebaseAuth, $ionicLoading, $ionicPopup){
+app.controller('LoginCtrl', function($scope, $state, $firebaseAuth, $ionicLoading, $ionicPopup, $firebaseObject){
 
   $scope.usuario = {};
 
@@ -7,7 +7,19 @@ app.controller('LoginCtrl', function($scope, $state, $firebaseAuth, $ionicLoadin
   var firebaseUser = $scope.authObj.$getAuth();
 
   if (firebaseUser) {
-    $state.go('cliente.localizar');
+    //Fazer busca no banco para verificar qual o tipo do usuario
+    var ref = firebase.database().ref('usuarios/' + firebaseUser.uid + '/tipo');
+
+    //Recuperar
+    $firebaseObject(ref).$loaded(function(obj) {
+        if (obj.$value == "cliente"){
+          $state.go('cliente.localizar');
+        } else if (obj.$value == "truck"){
+          $state.go('truck.home');
+        }
+   });
+
+    console.log(firebaseUser.providerData[0].email);
   }
 
 
@@ -15,11 +27,8 @@ app.controller('LoginCtrl', function($scope, $state, $firebaseAuth, $ionicLoadin
 
     $ionicLoading.show({template: 'Loading...'});
 
-    debugger;
-
     $scope.authObj.$signInWithEmailAndPassword(usuario.email, usuario.password)
           .then(function(firebaseUser){
-              console.log("Signed in as:", firebaseUser);
               $ionicLoading.hide();
               $state.go('cliente.localizar');
           }).catch(function(error){
@@ -33,51 +42,57 @@ app.controller('LoginCtrl', function($scope, $state, $firebaseAuth, $ionicLoadin
 
 });
 
-app.controller('ClienteCtrl', function($scope, $state, $cordovaGeolocation, $ionicAuth){
+app.controller('ClienteCtrl', function($scope, $firebaseAuth, $state){
+
+  $scope.authObj = $firebaseAuth();
+
+  var firebaseUser = $scope.authObj.$getAuth();
+
+  $scope.logout = function(){
+    $scope.authObj.$signOut();
+    $state.go('login');
+  }
     
-    $scope.verificarLocalizacao = function(){
+    // $scope.verificarLocalizacao = function(){
 
-      var posOptions = {timeout: 10000, enableHighAccuracy: false};
+    //   var posOptions = {timeout: 10000, enableHighAccuracy: false};
 
-      var latitude = null;
-      var longitude = null;
+    //   var latitude = null;
+    //   var longitude = null;
 
-      $cordovaGeolocation.getCurrentPosition(posOptions)
-          .then(function (position) {
-            latitude  = position.coords.latitude
-            longitude = position.coords.longitude
-            console.log(latitude + ' ' + longitude)
-      }, function(err) {
-          console.log(err)
-      });
+    //   $cordovaGeolocation.getCurrentPosition(posOptions)
+    //       .then(function (position) {
+    //         latitude  = position.coords.latitude
+    //         longitude = position.coords.longitude
+    //         console.log(latitude + ' ' + longitude)
+    //   }, function(err) {
+    //       console.log(err)
+    //   });
 
 
-      var watchOptions = {timeout : 3000, enableHighAccuracy: false};
-      var watch = $cordovaGeolocation.watchPosition(watchOptions);
+    //   var watchOptions = {timeout : 3000, enableHighAccuracy: false};
+    //   var watch = $cordovaGeolocation.watchPosition(watchOptions);
 
-      watch.then(
-        null,
+    //   watch.then(
+    //     null,
     
-        function(err) {
-          console.log(err)
-        },
+    //     function(err) {
+    //       console.log(err)
+    //     },
     
-        function(position) {
-          latitude  = position.coords.latitude
-          longitude = position.coords.longitude          
-          console.log(latitude + ' ' + longitude)
+    //     function(position) {
+    //       latitude  = position.coords.latitude
+    //       longitude = position.coords.longitude          
+    //       console.log(latitude + ' ' + longitude)
 
-          if(latitude != null && longitude != null){
-            $state.go('mapa', {lat: latitude, long: longitude});
-          }
-        }
-      );
-    }
+    //       if(latitude != null && longitude != null){
+    //         $state.go('mapa', {lat: latitude, long: longitude});
+    //       }
+    //     }
+    //   );
+    // }
 
-    $scope.logout = function(){
-      $ionicAuth.logout();
-      $state.go('login');
-    }
+    
 
 });
 
@@ -114,7 +129,6 @@ app.controller('RegistroCtrl', function($scope, $state, $ionicLoading, $ionicPop
                 $state.go('login');
 
             }).catch(function(error) {
-                debugger;
                 $ionicLoading.hide();
 
                 var alertPopup = $ionicPopup.alert({
@@ -130,7 +144,6 @@ app.controller('RegistroCtrl', function($scope, $state, $ionicLoading, $ionicPop
 
         var obj = $firebaseObject(ref);
 
-        debugger;
         obj.displayName = usuario.name;
         obj.email = firebaseUser.email;
         obj.tipo = usuario.tipo;
@@ -141,50 +154,6 @@ app.controller('RegistroCtrl', function($scope, $state, $ionicLoading, $ionicPop
             console.log("Error:", error);
         });
   }
-
-
-
-
-    
-  //   $scope.salvar = function(usuario){
-        
-  //       if (usuario.tipo == undefined){
-  //         $ionicPopup.alert({
-  //                   title: 'Dados Insuficientes',
-  //                   template: 'Preencha todos os dados'
-
-  //         });
-
-  //         return;
-  //       }
-
-
-  //   $ionicAuth.signup(usuario).then(
-  //     function(){
-        
-  //       var ref = firebase.database().ref('users');
-  //       delete usuario.password;
-
-  //       $firebaseArray(ref).$add(usuario).then(function() {
-
-  //         $state.go('login');
-
-  //         usuario.name = "";
-  //         usuario.email = "";
-
-  //       });
-
-  //     }, function(error){
-          
-  //       if (error.details[0] === "conflict_email") {
-  //         $ionicPopup.alert({
-  //                   title: 'Erro de Cadastro',
-  //                   template: 'E-mail já cadastrado'
-  //         });
-  //       }  
-
-  //     });
-  // }
 
 });
 
@@ -208,6 +177,77 @@ app.controller('MapaCtrl', function($scope, $state, $stateParams){
         
 });
 
-app.controller('PerfilCtrl', function($scope){
+app.controller('PerfilCtrl', function($scope, $firebaseAuth, $firebaseObject, $ionicLoading, $ionicPopup){
+
+  $scope.authObj = $firebaseAuth();
+
+  var firebaseUser = $scope.authObj.$getAuth();
+
+  $scope.usuario = angular.copy(firebaseUser);
+
+  var ref = firebase.database().ref('usuarios/' + firebaseUser.uid + '/displayName');
+
+  $firebaseObject(ref).$loaded(function(obj){
+      $scope.usuario.displayName = obj.$value;
+  });
+
+  $scope.atualizar = function(usuario){
+    $ionicLoading.show({template: 'Salvando...'});
+
+    firebaseUser.updateProfile({
+      displayName: usuario.displayName
+    }).then(function(response){
+        $ionicLoading.hide();
+        
+        atualizarUsuario(usuario.displayName);
+    }, function(error){
+        $ionicLoading.hide();
+        
+        return;
+
+    });
+  } // fim do $scope.atualizar
+
+  function atualizarUsuario(displayName) {
+    var ref = firebase.database().ref('usuarios/' + firebaseUser.uid + '/displayName');
+
+    var obj = $firebaseObject(ref);
+
+    obj.$value = displayName;
+
+    obj.$save().then(function(ref) {
+            ref.key === obj.$id; // true
+            var alertPopup = $ionicPopup.alert({
+                    title: 'Sucesso!',
+                    template: 'Atualizado com sucesso'
+            });
+        }, function(error) {
+            var alertPopup = $ionicPopup.alert({
+                    title: 'Erro',
+                    template: error
+            });
+    });
+  } //Fim do atualizarUsuario()
+
+  $scope.atualizarSenha = function(password) {
+        $scope.authObj.$updatePassword(password)
+            .then(function() {
+                var alertPopup = $ionicPopup.alert({
+                    title: 'Sucesso!',
+                    template: 'Senha alterada com sucesso'
+                });
+            }).catch(function(error) {
+                var alertPopup = $ionicPopup.alert({
+                    title: 'Erro',
+                    template: error
+                });
+            });
+  }
+
+});
+
+app.controller('LocalizarCtrl', function($scope){
+
+  
 
 });
