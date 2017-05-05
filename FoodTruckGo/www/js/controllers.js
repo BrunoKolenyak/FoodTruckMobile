@@ -1,19 +1,39 @@
-app.controller('LoginCtrl', function($scope, $state, $ionicAuth, $ionicUser){
+app.controller('LoginCtrl', function($scope, $state, $firebaseAuth, $ionicLoading, $ionicPopup){
+
+  $scope.usuario = {};
+
+  $scope.authObj = $firebaseAuth();
+
+  var firebaseUser = $scope.authObj.$getAuth();
+
+  if (firebaseUser) {
+    $state.go('cliente.localizar');
+  }
+
 
   $scope.login = function(usuario){
-      $ionicAuth.login('basic', usuario).then(function(usuario){
 
-          $ionicUser.set('data', new Date().toISOString());
-          $ionicUser.save();
+    $ionicLoading.show({template: 'Loading...'});
 
-          $state.go('cliente.localizar')
+    debugger;
 
-      });
+    $scope.authObj.$signInWithEmailAndPassword(usuario.email, usuario.password)
+          .then(function(firebaseUser){
+              console.log("Signed in as:", firebaseUser);
+              $ionicLoading.hide();
+              $state.go('cliente.localizar');
+          }).catch(function(error){
+              $ionicLoading.hide();
+              $ionicPopup.alert({
+                  title: 'Falha no Login',
+                  template: 'Email ou Senha invalidos'
+              });
+          });
   }
 
 });
 
-app.controller('ClienteCtrl', function($scope, $state, $cordovaGeolocation){
+app.controller('ClienteCtrl', function($scope, $state, $cordovaGeolocation, $ionicAuth){
     
     $scope.verificarLocalizacao = function(){
 
@@ -54,56 +74,117 @@ app.controller('ClienteCtrl', function($scope, $state, $cordovaGeolocation){
       );
     }
 
-    
-
-
-
-
-
-
+    $scope.logout = function(){
+      $ionicAuth.logout();
+      $state.go('login');
+    }
 
 });
 
-app.controller('RegistroCtrl', function($scope, $ionicAuth, $ionicPopup, $state, $firebaseArray){
+app.controller('RegistroCtrl', function($scope, $state, $ionicLoading, $ionicPopup, $firebaseAuth, $firebaseObject){
+
+  $scope.usuario = {};
+
+  $scope.authObj = $firebaseAuth();
+
+  $scope.salvar = function(usuario) {
+
+    $ionicLoading.show({template: 'Salvando...'});
+
+    if (usuario.tipo == undefined){
+      $ionicLoading.hide();
+
+      $ionicPopup.alert({
+          title: 'Dados Insuficientes',
+          template: 'Preencha todos os dados'
+
+      });
+
+      return;
+    }
+
+      $scope.authObj.$createUserWithEmailAndPassword(usuario.email, usuario.password)
+            .then(function(firebaseUser) {
+
+                $ionicLoading.hide();
+
+                console.log("User " + firebaseUser.uid + " created successfully!");
+
+                addUsuario(firebaseUser, usuario);
+                $state.go('login');
+
+            }).catch(function(error) {
+                debugger;
+                $ionicLoading.hide();
+
+                var alertPopup = $ionicPopup.alert({
+                    title: 'Falha no Registro',
+                    template: error
+                });
+            });
+  }
+
+  function addUsuario(firebaseUser, usuario) {
+
+        var ref = firebase.database().ref('usuarios/' + firebaseUser.uid);
+
+        var obj = $firebaseObject(ref);
+
+        debugger;
+        obj.displayName = usuario.name;
+        obj.email = firebaseUser.email;
+        obj.tipo = usuario.tipo;
+        obj.$save().then(function(ref) {
+            ref.key === obj.$id; // true
+            console.log('Usuário criado na base de dados');
+        }, function(error) {
+            console.log("Error:", error);
+        });
+  }
+
+
 
 
     
-    $scope.salvar = function(usuario){
-
-
-    $ionicAuth.signup(usuario).then(
-      function(){
+  //   $scope.salvar = function(usuario){
         
-        var ref = firebase.database().ref('users');
+  //       if (usuario.tipo == undefined){
+  //         $ionicPopup.alert({
+  //                   title: 'Dados Insuficientes',
+  //                   template: 'Preencha todos os dados'
+
+  //         });
+
+  //         return;
+  //       }
+
+
+  //   $ionicAuth.signup(usuario).then(
+  //     function(){
         
-        delete usuario.password;
+  //       var ref = firebase.database().ref('users');
+  //       delete usuario.password;
 
-        $firebaseArray(ref).$add(usuario).then(function() {
+  //       $firebaseArray(ref).$add(usuario).then(function() {
 
-          $state.go('login');
+  //         $state.go('login');
 
-        });
+  //         usuario.name = "";
+  //         usuario.email = "";
 
-      }, function(error){
+  //       });
+
+  //     }, function(error){
           
-        if(error.details[0] === "required_email"){
-          $ionicPopup.alert({
-                    title: 'Erro de Cadastro',
-                    template: 'O campo de e-mail é obrigatório'
-          });
-        } else if (error.details[0] === "conflict_email") {
-          $ionicPopup.alert({
-                    title: 'Erro de Cadastro',
-                    template: 'E-mail já cadastrado'
-          });
-        }
+  //       if (error.details[0] === "conflict_email") {
+  //         $ionicPopup.alert({
+  //                   title: 'Erro de Cadastro',
+  //                   template: 'E-mail já cadastrado'
+  //         });
+  //       }  
 
-        usuario.name = '';
-        usuario.email = '';
-        usuario.password = '';
-
-      });
-  }
+  //     });
+  // }
 
 });
 
@@ -125,6 +206,8 @@ app.controller('MapaCtrl', function($scope, $state, $stateParams){
           map: map
         });
         
+});
 
-           
+app.controller('PerfilCtrl', function($scope){
+
 });

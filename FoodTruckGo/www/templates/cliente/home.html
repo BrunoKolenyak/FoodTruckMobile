@@ -18,13 +18,13 @@
     </ion-header-bar>
     <ion-content>
       <ion-list>
-        <ion-item menu-close href="#/app/search">
-          Search
+        <ion-item menu-close ui-sref="cliente.localizar">
+          Localizar
         </ion-item>
-        <ion-item menu-close href="#/app/browse">
-          Meus Favoritos
+        <ion-item menu-close ui-sref="cliente.perfil">
+          Perfil
         </ion-item>
-        <ion-item menu-close href="#/app/playlists">
+        <ion-item menu-close ng-click="logout()">
           Logout
         </ion-item>
       </ion-list>

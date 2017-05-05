@@ -40,6 +40,7 @@ app.config(function($stateProvider, $urlRouterProvider, $ionicCloudProvider) {
   })
 
   .state('registro', {
+    cache: false,
     url: '/registro',
     templateUrl: 'templates/registro.html',
     controller: "RegistroCtrl"
@@ -57,6 +58,16 @@ app.config(function($stateProvider, $urlRouterProvider, $ionicCloudProvider) {
       views: {
         'menuContent': {
           templateUrl: 'templates/cliente/localizar.html'
+        }
+      },
+  })
+
+  .state('cliente.perfil', {
+      url: '/clientePerfil',
+      views: {
+        'menuContent': {
+          templateUrl: 'templates/cliente/perfil.html',
+          controller: 'PerfilCtrl'
         }
       }
   })

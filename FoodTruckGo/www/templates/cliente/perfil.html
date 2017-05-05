@@ -1,0 +1,36 @@
+<ion-view view-title="Perfil" class="login">
+  <ion-content padding>
+    <form class="padding" name="formProfile" ng-submit="atualizar(usuario)">
+    	<ion-list>
+    		<label class="item item-input item-stacked-label-label">
+    			<span class="input-label">Nome:</span>
+    			<input type="text" ng-model="usuario.displayName">
+    		</label>
+
+    		<label class="item item-input item-stacked-label-label">
+    			<span class="input-label">E-Mail:</span>
+    			<input type="email" readonly ng-model="usuario.email">
+    		</label>
+
+    		<button class="button button-block button-balanced" ng-disabled="formProfile.$invalid">Atualizar
+    		</button>
+
+    	</ion-list>
+    </form>
+
+    <form class="padding" name="formProfilePassword" ng-submit="atualizarSenha(usuario.password)">
+    	<ion-list>
+    	  <label class="item item-input item-stacked-label-label">
+    	  	<span class="input-label">Senha:</span>
+    	  	<input type="password" ng-model="usuario.password" required ng-minlength="6">
+    	  </label>
+
+	  		<button class="button button-block button-balanced" ng-disabled="formProfilePassword.$invalid">
+	  			Atualizar Senha
+	  		</button>
+
+    	</ion-list>
+    </form>    
+
+  </ion-content>
+</ion-view>

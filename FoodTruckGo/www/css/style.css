@@ -30,7 +30,7 @@
 	padding: 5px;
 }
 
-ion-nav-bar, button, a, span, p, h1, h2, h3{
+ion-nav-bar, button, a, span, p, h1, h2, h3, ion-item{
 	font-family: 'Gloria Hallelujah', cursive;
 }
 
