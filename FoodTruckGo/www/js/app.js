@@ -86,11 +86,21 @@ app.config(function($stateProvider, $urlRouterProvider, $ionicCloudProvider) {
     controller: 'TruckCtrl'
   })
 
+  .state('truck.perfil', {
+      url: '/truckPerfil',
+      views: {
+        'menuContent': {
+          templateUrl: 'templates/truck/perfil.html',
+          controller: 'PerfilTruckCtrl'
+        }
+      },
+  })
+
   .state('truck.home', {
       url: '/truckHome',
       views: {
         'menuContent': {
-          templateUrl: 'templates/truck/inicial.html',
+          templateUrl: 'templates/truck/truck.html',
         }
       },
   })

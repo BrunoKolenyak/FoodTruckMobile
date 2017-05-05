@@ -7,6 +7,7 @@ app.controller('LoginCtrl', function($scope, $state, $firebaseAuth, $ionicLoadin
   var firebaseUser = $scope.authObj.$getAuth();
 
   if (firebaseUser) {
+    
     //Fazer busca no banco para verificar qual o tipo do usuario
     var ref = firebase.database().ref('usuarios/' + firebaseUser.uid + '/tipo');
 
@@ -18,7 +19,7 @@ app.controller('LoginCtrl', function($scope, $state, $firebaseAuth, $ionicLoadin
           $state.go('truck.home');
         }
    });
-
+    
     console.log(firebaseUser.providerData[0].email);
   }
 
@@ -247,6 +248,12 @@ app.controller('PerfilCtrl', function($scope, $firebaseAuth, $firebaseObject, $i
 });
 
 app.controller('LocalizarCtrl', function($scope){
+
+  
+
+});
+
+app.controller('TruckCtrl', function($scope){
 
   
 
