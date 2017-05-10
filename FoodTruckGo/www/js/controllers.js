@@ -7,22 +7,31 @@ app.controller('LoginCtrl', function($scope, $state, $firebaseAuth, $ionicLoadin
   var firebaseUser = $scope.authObj.$getAuth();
 
   if (firebaseUser) {
-    
-    //Fazer busca no banco para verificar qual o tipo do usuario
-    var ref = firebase.database().ref('usuarios/' + firebaseUser.uid + '/tipo');
-
-    //Recuperar
-    $firebaseObject(ref).$loaded(function(obj) {
-        if (obj.$value == "cliente"){
-          $state.go('cliente.localizar');
-        } else if (obj.$value == "truck"){
-          $state.go('truck.home');
-        }
-   });
-    
-    console.log(firebaseUser.providerData[0].email);
+    validarUsuario(firebaseUser);
   }
 
+  function validarUsuario(firebaseUser){
+    //Fazer busca no banco para verificar se eh usuario
+    var ref = firebase.database().ref('usuarios/' + firebaseUser.uid + '/tipo');
+        //Recuperar
+        $firebaseObject(ref).$loaded(function(obj) {
+            if (obj.$value == "cliente"){
+              $state.go('cliente.localizar');
+            } else {
+              //Verificar se eh do tipo Truck
+              ref = firebase.database().ref('trucks/' + firebaseUser.uid + '/tipo'); 
+              $firebaseObject(ref).$loaded(function(obj) {
+                if (obj.$value == "truck"){
+                  $state.go('truck.home');
+                }
+              });
+
+            }
+       });
+    
+      console.log(firebaseUser.providerData[0].email);
+  }
+  
 
   $scope.login = function(usuario){
 
@@ -31,7 +40,7 @@ app.controller('LoginCtrl', function($scope, $state, $firebaseAuth, $ionicLoadin
     $scope.authObj.$signInWithEmailAndPassword(usuario.email, usuario.password)
           .then(function(firebaseUser){
               $ionicLoading.hide();
-              $state.go('cliente.localizar');
+              validarUsuario(firebaseUser);
           }).catch(function(error){
               $ionicLoading.hide();
               $ionicPopup.alert({
@@ -40,7 +49,6 @@ app.controller('LoginCtrl', function($scope, $state, $firebaseAuth, $ionicLoadin
               });
           });
   }
-
 });
 
 app.controller('ClienteCtrl', function($scope, $firebaseAuth, $state){
@@ -93,8 +101,6 @@ app.controller('ClienteCtrl', function($scope, $firebaseAuth, $state){
     //   );
     // }
 
-    
-
 });
 
 app.controller('RegistroCtrl', function($scope, $state, $ionicLoading, $ionicPopup, $firebaseAuth, $firebaseObject){
@@ -126,7 +132,11 @@ app.controller('RegistroCtrl', function($scope, $state, $ionicLoading, $ionicPop
 
                 console.log("User " + firebaseUser.uid + " created successfully!");
 
-                addUsuario(firebaseUser, usuario);
+                if(usuario.tipo == "cliente"){
+                  addUsuario(firebaseUser, usuario);
+                } else if (usuario.tipo == "truck"){
+                  addTruck(firebaseUser, usuario);
+                }
                 $state.go('login');
 
             }).catch(function(error) {
@@ -156,8 +166,26 @@ app.controller('RegistroCtrl', function($scope, $state, $ionicLoading, $ionicPop
         });
   }
 
-});
+  function addTruck(firebaseUser, usuario) { 
 
+    var ref = firebase.database().ref('trucks/' + firebaseUser.uid);
+
+    var obj = $firebaseObject(ref);
+
+    obj.displayName = usuario.name;
+    obj.email = firebaseUser.email;
+    obj.tipo = usuario.tipo;
+
+    obj.$save().then(function(ref) {
+            ref.key === obj.$id; // true
+            console.log('Truck criado na base de dados');
+        }, function(error) {
+            console.log("Error:", error);
+        });
+
+  }
+
+});
 
 app.controller('MapaCtrl', function($scope, $state, $stateParams){
 
@@ -247,14 +275,46 @@ app.controller('PerfilCtrl', function($scope, $firebaseAuth, $firebaseObject, $i
 
 });
 
-app.controller('LocalizarCtrl', function($scope){
+app.controller('LocalizarCtrl', function($scope, $firebaseAuth, $firebaseObject){
 
-  
+  $scope.usuario = {};
+  //Buscar o nome do Usuario que esta logado
+  $scope.authObj = $firebaseAuth();
+
+  var firebaseUser = $scope.authObj.$getAuth();
+
+  $scope.usuario = angular.copy(firebaseUser);
+
+  var ref = firebase.database().ref('usuarios/' + firebaseUser.uid + '/displayName');
+
+  $firebaseObject(ref).$loaded(function(obj){
+      $scope.usuario.displayName = obj.$value;
+  });
 
 });
 
-app.controller('TruckCtrl', function($scope){
+app.controller('TruckCtrl', function($scope, $firebaseAuth, $firebaseObject, $state){
+  $scope.truck = {};
 
+  $scope.authObj = $firebaseAuth();
+
+  var firebaseUser = $scope.authObj.$getAuth();
+
+  $scope.truck = angular.copy(firebaseUser);
+
+  var ref = firebase.database().ref('trucks/' + firebaseUser.uid + '/displayName');
+
+  $firebaseObject(ref).$loaded(function(obj){
+      $scope.truck.displayName = obj.$value;
+  });
+
+  $scope.logout = function(){
+    $scope.authObj.$signOut();
+    $state.go('login');
+  }
   
+});
+
+app.controller('PerfilTruckCtrl', function($scope){
 
 });
