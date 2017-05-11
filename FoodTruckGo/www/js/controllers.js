@@ -51,7 +51,7 @@ app.controller('LoginCtrl', function($scope, $state, $firebaseAuth, $ionicLoadin
   }
 });
 
-app.controller('ClienteCtrl', function($scope, $firebaseAuth, $state){
+app.controller('ClienteCtrl', function($scope, $firebaseAuth, $state, $cordovaGeolocation){
 
   $scope.authObj = $firebaseAuth();
 
@@ -62,44 +62,44 @@ app.controller('ClienteCtrl', function($scope, $firebaseAuth, $state){
     $state.go('login');
   }
     
-    // $scope.verificarLocalizacao = function(){
+    $scope.verificarLocalizacao = function(){
 
-    //   var posOptions = {timeout: 10000, enableHighAccuracy: false};
+      var posOptions = {timeout: 10000, enableHighAccuracy: false};
 
-    //   var latitude = null;
-    //   var longitude = null;
+      var latitude = null;
+      var longitude = null;
 
-    //   $cordovaGeolocation.getCurrentPosition(posOptions)
-    //       .then(function (position) {
-    //         latitude  = position.coords.latitude
-    //         longitude = position.coords.longitude
-    //         console.log(latitude + ' ' + longitude)
-    //   }, function(err) {
-    //       console.log(err)
-    //   });
+      $cordovaGeolocation.getCurrentPosition(posOptions)
+          .then(function (position) {
+            latitude  = position.coords.latitude
+            longitude = position.coords.longitude
+            console.log(latitude + ' ' + longitude)
+      }, function(err) {
+          console.log(err)
+      });
 
 
-    //   var watchOptions = {timeout : 3000, enableHighAccuracy: false};
-    //   var watch = $cordovaGeolocation.watchPosition(watchOptions);
+      var watchOptions = {timeout : 3000, enableHighAccuracy: false};
+      var watch = $cordovaGeolocation.watchPosition(watchOptions);
 
-    //   watch.then(
-    //     null,
+      watch.then(
+        null,
     
-    //     function(err) {
-    //       console.log(err)
-    //     },
+        function(err) {
+          console.log(err)
+        },
     
-    //     function(position) {
-    //       latitude  = position.coords.latitude
-    //       longitude = position.coords.longitude          
-    //       console.log(latitude + ' ' + longitude)
+        function(position) {
+          latitude  = position.coords.latitude
+          longitude = position.coords.longitude          
+          console.log(latitude + ' ' + longitude)
 
-    //       if(latitude != null && longitude != null){
-    //         $state.go('mapa', {lat: latitude, long: longitude});
-    //       }
-    //     }
-    //   );
-    // }
+          if(latitude != null && longitude != null){
+            $state.go('mapa', {lat: latitude, long: longitude});
+          }
+        }
+      );
+    }
 
 });
 
@@ -206,7 +206,7 @@ app.controller('MapaCtrl', function($scope, $state, $stateParams){
         
 });
 
-app.controller('PerfilCtrl', function($scope, $firebaseAuth, $firebaseObject, $ionicLoading, $ionicPopup){
+app.controller('PerfilCtrl', function($scope, $firebaseAuth, $firebaseObject, $ionicLoading, $ionicPopup, $state){
 
   $scope.authObj = $firebaseAuth();
 
@@ -246,9 +246,13 @@ app.controller('PerfilCtrl', function($scope, $firebaseAuth, $firebaseObject, $i
 
     obj.$save().then(function(ref) {
             ref.key === obj.$id; // true
-            var alertPopup = $ionicPopup.alert({
-                    title: 'Sucesso!',
-                    template: 'Atualizado com sucesso'
+            //deslogar apos concluir a atualizacao
+            $scope.authObj.$signOut();
+            $ionicLoading.show({
+              template: 'Atualizado com sucesso, você terá que logar novamente!',
+              duration: 1000
+            }).then(function(){
+                $state.go('login');
             });
         }, function(error) {
             var alertPopup = $ionicPopup.alert({
@@ -261,10 +265,14 @@ app.controller('PerfilCtrl', function($scope, $firebaseAuth, $firebaseObject, $i
   $scope.atualizarSenha = function(password) {
         $scope.authObj.$updatePassword(password)
             .then(function() {
-                var alertPopup = $ionicPopup.alert({
-                    title: 'Sucesso!',
-                    template: 'Senha alterada com sucesso'
-                });
+                //deslogar apos concluir a atualizacao
+            $scope.authObj.$signOut();
+            $ionicLoading.show({
+              template: 'Senha alterada com sucesso, você terá que logar novamente!',
+              duration: 1000
+            }).then(function(){
+                $state.go('login');
+            });
             }).catch(function(error) {
                 var alertPopup = $ionicPopup.alert({
                     title: 'Erro',
@@ -315,6 +323,83 @@ app.controller('TruckCtrl', function($scope, $firebaseAuth, $firebaseObject, $st
   
 });
 
-app.controller('PerfilTruckCtrl', function($scope){
+app.controller('PerfilTruckCtrl', function($scope, $firebaseAuth, $firebaseObject, $ionicLoading, $ionicPopup, $state){
+
+  $scope.authObj = $firebaseAuth();
+
+  var firebaseUser = $scope.authObj.$getAuth();
+
+  $scope.truck = angular.copy(firebaseUser);
+
+  var ref = firebase.database().ref('trucks/' + firebaseUser.uid + '/displayName');
+
+  $firebaseObject(ref).$loaded(function(obj){
+      $scope.truck.displayName = obj.$value;
+  });
+
+  $scope.atualizar = function(truck){
+    $ionicLoading.show({template: 'Salvando...'});
+
+    firebaseUser.updateProfile({
+      displayName: truck.displayName
+    }).then(function(response){
+        $ionicLoading.hide();
+        
+        atualizarTruck(truck.displayName);
+    }, function(error){
+        $ionicLoading.hide();
+        
+        return;
+
+    });
+  } // fim do $scope.atualizar
+
+  function atualizarTruck(displayName) {
+    var ref = firebase.database().ref('trucks/' + firebaseUser.uid + '/displayName');
+
+    var obj = $firebaseObject(ref);
+
+    obj.$value = displayName;
+
+    obj.$save().then(function(ref) {
+            ref.key === obj.$id; // true
+
+            //deslogar apos concluir a atualizacao
+            $scope.authObj.$signOut();
+            $ionicLoading.show({
+              template: 'Atualizado com sucesso, você terá que logar novamente!',
+              duration: 1000
+            }).then(function(){
+                $state.go('login');
+            });
+            
+              
+            
+        }, function(error) {
+            var alertPopup = $ionicPopup.alert({
+                    title: 'Erro',
+                    template: error
+            });
+    });
+  } //Fim do atualizarTruck()
+
+  $scope.atualizarSenha = function(password) {
+        $scope.authObj.$updatePassword(password)
+            .then(function() {
+                //deslogar apos concluir a atualizacao
+                $scope.authObj.$signOut();
+                $ionicLoading.show({
+                  template: 'Atualizado com sucesso, você terá que logar novamente!',
+                  duration: 1000
+                }).then(function(){
+                    $state.go('login');
+                });
+            }).catch(function(error) {
+                var alertPopup = $ionicPopup.alert({
+                    title: 'Erro',
+                    template: error
+                });
+            });
+  }
 
 });

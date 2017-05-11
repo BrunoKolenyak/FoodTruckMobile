@@ -54,6 +54,7 @@ app.config(function($stateProvider, $urlRouterProvider, $ionicCloudProvider) {
   })
 
   .state('cliente.localizar', {
+      cache: false,
       url: '/clienteLocalizar',
       views: {
         'menuContent': {
@@ -80,6 +81,7 @@ app.config(function($stateProvider, $urlRouterProvider, $ionicCloudProvider) {
   })
 
   .state('truck', {
+    cache: false,
     url: '/truck',
     abstract: true,
     templateUrl: 'templates/truck/home.html',
@@ -87,6 +89,7 @@ app.config(function($stateProvider, $urlRouterProvider, $ionicCloudProvider) {
   })
 
   .state('truck.perfil', {
+      cache: false,
       url: '/truckPerfil',
       views: {
         'menuContent': {
@@ -97,6 +100,7 @@ app.config(function($stateProvider, $urlRouterProvider, $ionicCloudProvider) {
   })
 
   .state('truck.home', {
+      cache: false,
       url: '/truckHome',
       views: {
         'menuContent': {

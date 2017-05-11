@@ -1,15 +1,17 @@
 <ion-view view-title="Perfil" class="login">
   <ion-content padding>
-    <form class="padding" name="formProfile" ng-submit="atualizar(usuario)">
+
+    <h4>Dados Básicos</h4>
+    <form class="padding" name="formProfile" ng-submit="atualizar(truck)">
     	<ion-list>
     		<label class="item item-input item-stacked-label-label">
     			<span class="input-label">Nome:</span>
-    			<input type="text" ng-model="usuario.displayName">
+    			<input type="text" ng-model="truck.displayName">
     		</label>
 
     		<label class="item item-input item-stacked-label-label">
     			<span class="input-label">E-Mail:</span>
-    			<input type="email" readonly ng-model="usuario.email">
+    			<input type="email" readonly ng-model="truck.email">
     		</label>
 
     		<button class="button button-block button-balanced" ng-disabled="formProfile.$invalid">Atualizar
@@ -18,11 +20,11 @@
     	</ion-list>
     </form>
 
-    <form class="padding" name="formProfilePassword" ng-submit="atualizarSenha(usuario.password)">
+    <form class="padding" name="formProfilePassword" ng-submit="atualizarSenha(truck.password)">
     	<ion-list>
     	  <label class="item item-input item-stacked-label-label">
     	  	<span class="input-label">Senha:</span>
-    	  	<input type="password" ng-model="usuario.password" required ng-minlength="6">
+    	  	<input type="password" ng-model="truck.password" required ng-minlength="6">
     	  </label>
 
 	  		<button class="button button-block button-balanced" ng-disabled="formProfilePassword.$invalid">
@@ -30,7 +32,15 @@
 	  		</button>
 
     	</ion-list>
-    </form>    
+    </form>
 
+    <form class="padding" name="formProfileLocation" ng-submit="atualizarLocalizacao(localizacao)">
+        <h4>Localização</h4>    
+        <ion-list>
+            <button class="button button-block button-dark" ng-click="buscarLocalizacao()">Buscar</button>        
+            
+        </ion-list>
+
+    </form>    
   </ion-content>
 </ion-view>

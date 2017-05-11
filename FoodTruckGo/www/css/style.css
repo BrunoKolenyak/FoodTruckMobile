@@ -30,7 +30,7 @@
 	padding: 5px;
 }
 
-ion-nav-bar, button, a, span, p, h1, h2, h3, ion-item{
+ion-nav-bar, button, a, span, p, h1, h2, h3, h4, ion-item{
 	font-family: 'Gloria Hallelujah', cursive;
 }
 
@@ -59,7 +59,22 @@ ion-nav-bar, button, a, span, p, h1, h2, h3, ion-item{
 	background-size: cover;
 }
 
+.truck{
+	background-image: url("../img/login-image.jpg");
+	background-size: cover;
+}
+
 #map{
-    height: 90vh;
+    height: 100%;
     width: 100%;
+}
+
+.truck h2{
+	padding-top: 0.5em;
+	color: white;
+}
+
+.truck h3{
+	padding-top: 4em;
+	text-align: center;
 }
