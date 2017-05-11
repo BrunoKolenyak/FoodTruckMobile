@@ -74,31 +74,35 @@ app.controller('ClienteCtrl', function($scope, $firebaseAuth, $state, $cordovaGe
             latitude  = position.coords.latitude
             longitude = position.coords.longitude
             console.log(latitude + ' ' + longitude)
+
+            if(latitude != null && longitude != null){
+              $state.go('mapa', {lat: latitude, long: longitude});
+            }
       }, function(err) {
           console.log(err)
       });
 
 
-      var watchOptions = {timeout : 3000, enableHighAccuracy: false};
-      var watch = $cordovaGeolocation.watchPosition(watchOptions);
+      // var watchOptions = {timeout : 3000, enableHighAccuracy: false};
+      // var watch = $cordovaGeolocation.watchPosition(watchOptions);
 
-      watch.then(
-        null,
+      // watch.then(
+      //   null,
     
-        function(err) {
-          console.log(err)
-        },
+      //   function(err) {
+      //     console.log(err)
+      //   },
     
-        function(position) {
-          latitude  = position.coords.latitude
-          longitude = position.coords.longitude          
-          console.log(latitude + ' ' + longitude)
+      //   function(position) {
+      //     latitude  = position.coords.latitude
+      //     longitude = position.coords.longitude          
+      //     console.log(latitude + ' ' + longitude)
 
-          if(latitude != null && longitude != null){
-            $state.go('mapa', {lat: latitude, long: longitude});
-          }
-        }
-      );
+      //     if(latitude != null && longitude != null){
+      //       $state.go('mapa', {lat: latitude, long: longitude});
+      //     }
+      //   }
+      // );
     }
 
 });

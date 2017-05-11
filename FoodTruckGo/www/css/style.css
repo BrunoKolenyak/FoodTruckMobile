@@ -65,7 +65,7 @@ ion-nav-bar, button, a, span, p, h1, h2, h3, h4, ion-item{
 }
 
 #map{
-    height: 100%;
+    height: 90vh;
     width: 100%;
 }
 
