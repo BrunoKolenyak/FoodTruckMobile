@@ -82,27 +82,6 @@ app.controller('ClienteCtrl', function($scope, $firebaseAuth, $state, $cordovaGe
           console.log(err)
       });
 
-
-      // var watchOptions = {timeout : 3000, enableHighAccuracy: false};
-      // var watch = $cordovaGeolocation.watchPosition(watchOptions);
-
-      // watch.then(
-      //   null,
-    
-      //   function(err) {
-      //     console.log(err)
-      //   },
-    
-      //   function(position) {
-      //     latitude  = position.coords.latitude
-      //     longitude = position.coords.longitude          
-      //     console.log(latitude + ' ' + longitude)
-
-      //     if(latitude != null && longitude != null){
-      //       $state.go('mapa', {lat: latitude, long: longitude});
-      //     }
-      //   }
-      // );
     }
 
 });
@@ -198,6 +177,29 @@ app.controller('MapaCtrl', function($scope, $state, $stateParams){
     var latitude = $stateParams.lat;
     var longitude = $stateParams.long;
 
+    var lugares = {};
+    var lat = {};
+    var long = {};
+
+    var ref = firebase.database().ref('trucks');
+    ref.on('value', function(resp){
+      let valor = resp.val();
+      let array;
+      array = Object.keys(valor).map(function(key){
+        return valor[key];
+      });   
+
+      for(let i = 0; i < array.length; i++){
+        setTimeout(function(){
+            addMarkerMethod(array.latitude, array.longitude);
+        }, i * 200);
+
+      }
+
+      console.log(array);
+
+    })
+
    var uluru = {lat: parseFloat(latitude), lng: parseFloat(longitude)};
       var map = new google.maps.Map(document.getElementById('map'), {
           zoom: 16,
@@ -207,7 +209,14 @@ app.controller('MapaCtrl', function($scope, $state, $stateParams){
           position: uluru,
           map: map
         });
-        
+
+    function addLocalizacao(latitude, longitude) {
+        var local = {lat: parseFloat(latitude), lng: parseFloat(longitude)};
+        var marker = new google.maps.Marker({
+          position: local,
+          map: map
+        });
+    }
 });
 
 app.controller('PerfilCtrl', function($scope, $firebaseAuth, $firebaseObject, $ionicLoading, $ionicPopup, $state){
@@ -327,7 +336,7 @@ app.controller('TruckCtrl', function($scope, $firebaseAuth, $firebaseObject, $st
   
 });
 
-app.controller('PerfilTruckCtrl', function($scope, $firebaseAuth, $firebaseObject, $ionicLoading, $ionicPopup, $state){
+app.controller('PerfilTruckCtrl', function($scope, $firebaseAuth, $firebaseObject, $ionicLoading, $ionicPopup, $state, $cordovaGeolocation){
 
   $scope.authObj = $firebaseAuth();
 
@@ -340,6 +349,27 @@ app.controller('PerfilTruckCtrl', function($scope, $firebaseAuth, $firebaseObjec
   $firebaseObject(ref).$loaded(function(obj){
       $scope.truck.displayName = obj.$value;
   });
+
+  $scope.buscarLocalizacao = function(truck){
+      
+      var posOptions = {timeout: 10000, enableHighAccuracy: false};
+
+      var latitude = null;
+      var longitude = null;
+
+      $cordovaGeolocation.getCurrentPosition(posOptions)
+          .then(function (position) {
+            latitude  = position.coords.latitude
+            longitude = position.coords.longitude
+            console.log(latitude + ' ' + longitude)
+
+            if(latitude != null && longitude != null){
+              addLocalizacao(latitude, longitude);
+            }
+      }, function(err) {
+          console.log(err)
+      });     
+  }
 
   $scope.atualizar = function(truck){
     $ionicLoading.show({template: 'Salvando...'});
@@ -404,6 +434,29 @@ app.controller('PerfilTruckCtrl', function($scope, $firebaseAuth, $firebaseObjec
                     template: error
                 });
             });
+  }
+
+  function addLocalizacao(latitude, longitude) {
+        var ref = firebase.database().ref('trucks/' + firebaseUser.uid);
+
+        $firebaseObject(ref).$loaded(function(obj){
+
+            obj.longitude = longitude;
+            obj.latitude = latitude;
+
+            obj.$save().then(function(){
+                    var alertPopup = $ionicPopup.alert({
+                        title: 'Sucesso',
+                        template: 'Salvo com sucesso'
+                    });
+            }, function(error) {
+                var alertPopup = $ionicPopup.alert({
+                        title: 'Error',
+                        template: error
+                    });
+            });
+
+        });       
   }
 
 });
