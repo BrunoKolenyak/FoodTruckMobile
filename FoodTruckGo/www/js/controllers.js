@@ -191,7 +191,8 @@ app.controller('MapaCtrl', function($scope, $state, $stateParams){
 
       for(let i = 0; i < array.length; i++){
         setTimeout(function(){
-            addMarkerMethod(array.latitude, array.longitude);
+            debugger;
+            addMarkerMethod(array[i].latitude, array[i].longitude);
         }, i * 200);
 
       }
@@ -210,7 +211,8 @@ app.controller('MapaCtrl', function($scope, $state, $stateParams){
           map: map
         });
 
-    function addLocalizacao(latitude, longitude) {
+    function addMarkerMethod(latitude, longitude) {
+        debugger;
         var local = {lat: parseFloat(latitude), lng: parseFloat(longitude)};
         var marker = new google.maps.Marker({
           position: local,

@@ -8,7 +8,6 @@
 	padding: 10px;
 	font-size: 2em;
 	text-align: center;
-	font-family: 'Gloria Hallelujah', cursive;
 }
 
 .login .item-floating-label{
@@ -22,16 +21,11 @@
 .login ::-webkit-input-placeholder, input{
 	color: black;
 	font-size: 1.3em;
-	font-family: 'Gloria Hallelujah', cursive;
 }
 
 .registro p{
 	margin-top: 2em;
 	padding: 5px;
-}
-
-ion-nav-bar, button, a, span, p, h1, h2, h3, h4, ion-item{
-	font-family: 'Gloria Hallelujah', cursive;
 }
 
 .radio-label{
