@@ -182,8 +182,8 @@ app.controller('MapaCtrl', function($scope, $state, $stateParams){
     var long = {};
 
     var ref = firebase.database().ref('trucks');
-    ref.on('value', function(resp){
-      let valor = resp.val();
+    ref.on('value', function(data){
+      let valor = data.val();
       let array;
       array = Object.keys(valor).map(function(key){
         return valor[key];
@@ -338,7 +338,7 @@ app.controller('TruckCtrl', function($scope, $firebaseAuth, $firebaseObject, $st
   
 });
 
-app.controller('PerfilTruckCtrl', function($scope, $firebaseAuth, $firebaseObject, $ionicLoading, $ionicPopup, $state, $cordovaGeolocation){
+app.controller('PerfilTruckCtrl', function($scope, $firebaseAuth, $firebaseObject, $ionicLoading, $ionicPopup, $state, $cordovaGeolocation, $cordovaImagePicker, $firebaseStorage, $cordovaFile){
 
   $scope.authObj = $firebaseAuth();
 
@@ -438,6 +438,37 @@ app.controller('PerfilTruckCtrl', function($scope, $firebaseAuth, $firebaseObjec
             });
   }
 
+  $scope.atualizarDescricao = function(descricao, segmento) {
+
+      if(descricao == null || segmento == null){
+        var alertPopup = $ionicPopup.alert({
+                  title: 'Error',
+                  template: 'Por favor, preencha a descrição e o tipo'
+        });
+
+        return;
+      }
+
+      var ref = firebase.database().ref('trucks/' + firebaseUser.uid);
+      $firebaseObject(ref).$loaded(function(obj){
+          obj.descricao = descricao;
+          obj.segmento = segmento;
+
+          obj.$save().then(function(){
+              var alertPopup = $ionicPopup.alert({
+                  title: 'Sucesso',
+                  template: 'Detalhes salvos com sucesso'
+              });
+          }, function (error){
+              var alertPopup = $ionicPopup.alert({
+                  title: 'Error',
+                  template: error
+              });
+          });
+
+      });
+  }
+
   function addLocalizacao(latitude, longitude) {
         var ref = firebase.database().ref('trucks/' + firebaseUser.uid);
 
@@ -460,5 +491,76 @@ app.controller('PerfilTruckCtrl', function($scope, $firebaseAuth, $firebaseObjec
 
         });       
   }
+    
+  $scope.getPicture = function (options) {
+  
+      var options = {
+       maximumImagesCount: 1,
+       width: 300,
+       height: 300,
+       quality: 80
+      };
+
+      $cordovaImagePicker.getPictures(options).then(function(imagem) {
+          $scope.picture = imagem[0];
+
+          var fileName = imagem[0].replace(/^.*[\\\/]/, '');
+
+
+          $cordovaFile.readAsArrayBuffer(cordova.file.dataDirectory, fileName)
+            .then(function (success) {
+              alert("sucess");
+              // success
+              var imageBlob = new Blob([success], {type : "image/jpeg"});
+
+              saveToFirebase(imageBlob, fileName, function(_response){
+
+                if(_response){
+
+                    alert(_response.downloadURL);
+                }
+
+              });
+            }, function (error) {
+              alert(error.message);
+            });
+      }, function(err) {
+         console.log(err);
+      });
+  }
+
+  function saveToFirebase(_imageBlob, _filename, _callback){
+
+      alert("savefirebase");
+
+      var storageRef = firebase.storage().ref();
+
+
+      var uploadTask = storageRef.child('images/' + _filename).put(_imageBlob);
+
+      uploadTask.on('state_changed', function(snapshot){
+
+
+      }, function(error){
+
+          alert(error.message);
+          _callback(null);
+      }, function(){
+
+        var downloadURL = uploadTask.snapshot.downloadURL;
+
+        //quando termina, passar a informacao que salvou a img
+        _callback(uploadTask.snapshot);
+      });
+
+  }
+
+});
+
+app.controller('ListaTruckCtrl', function($scope, $firebaseArray){
+
+  //buscar todos os food trucks
+  var ref = firebase.database().ref('trucks');
+  $scope.trucks = $firebaseArray(ref);
 
 });

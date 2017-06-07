@@ -1,0 +1,13 @@
+<ion-view view-title="Food-Trucks">
+  <ion-content padding>
+      <ion-list>
+        <ion-item ng-repeat="truck in trucks">
+            <div class="item item-avatar">
+                <img src="{{truck.picture}}">
+                <h2>{{truck.displayName}}</h2>
+                <p>{{truck.segmento}}</p>
+            </div>        
+        </ion-item>
+      </ion-list>
+  </ion-content>
+</ion-view>

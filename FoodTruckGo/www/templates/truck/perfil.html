@@ -34,13 +34,44 @@
     	</ion-list>
     </form>
 
+    <button class="padding" ng-click="getPicture()">Carregar da Galeria</button>
+    <img class="padding" ng-src="{{picture}}">
+
     <form class="padding" name="formProfileLocation" ng-submit="atualizarLocalizacao(localizacao)">
         <h4>Localização</h4>    
         <ion-list>
             <button class="button button-block button-dark" ng-click="buscarLocalizacao()">Salvar minha Localização Atual</button>        
             
         </ion-list>
-
     </form>    
+
+    <form class="padding" name="formProfileDescription" ng-submit="atualizarDescricao(truck.descricao, truck.segmento)">
+        <h4>Detalhes</h4>
+        <ion-list>
+            <label class="item item-input item-select">
+            <div class="input-label">
+              Tipo
+            </div>
+            <select ng-model="truck.segmento">
+              <option value="Lanche" selected>Lanche</option>
+              <option value="Pizza">Pizza</option>
+              <option value="Cervejas">Cervejas</option>
+              <option value="Sucos">Sucos</option>
+              <option value="Comida Japonesa">Comida Japonesa</option>
+              <option value="Comida Mexicana">Comida Mexicana</option>
+              <option value="Churrasco">Churrasco</option>
+              <option value="Petiscos">Petiscos</option>
+            </select>
+          </label>
+        </ion-list>
+        <ion-list class="padding">
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">Digite a descrição:</span>
+                <textarea ng-model="truck.descricao" placeholder="No máximo 255 caracteres" maxlength="255"></textarea>
+            </label>
+        </ion-list>
+        <button class="button button-block button-balanced">Atualizar Detalhes</button>
+    </form>
+
   </ion-content>
 </ion-view>

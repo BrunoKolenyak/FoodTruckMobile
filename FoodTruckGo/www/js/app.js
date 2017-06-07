@@ -74,6 +74,16 @@ app.config(function($stateProvider, $urlRouterProvider, $ionicCloudProvider) {
       }
   })
 
+  .state('cliente.listaTrucks', {
+      url: '/listaTrucks',
+      views: {
+        'menuContent': {
+          templateUrl: 'templates/cliente/listaTrucks.html',
+          controller: 'ListaTruckCtrl'
+        }
+      }
+  })
+
   .state('mapa', {
     url: '/mapa?:lat&:long',
     templateUrl: 'templates/cliente/mapa.html',
